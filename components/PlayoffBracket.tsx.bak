@@ -1,0 +1,116 @@
+import Image from 'next/image'
+import type { PlayoffBracket, PlayoffSeries } from '@/types/nhl'
+
+const ROUND_LABELS: Record<number, string> = {
+  1: '1st Round',
+  2: '2nd Round',
+  3: 'Conference Finals',
+  4: 'Stanley Cup Finals',
+}
+
+function TeamRow({
+  team,
+  seedAbbrev,
+  wins,
+  isWinner,
+  isDimmed,
+}: {
+  team: { commonName: { default: string }; darkLogo: string }
+  seedAbbrev: string
+  wins: number
+  isWinner: boolean
+  isDimmed: boolean
+}) {
+  return (
+    <div className={`flex items-center gap-2 py-1.5 ${isDimmed ? 'opacity-40' : ''}`}>
+      <span className="w-7 shrink-0 text-xs text-muted-foreground text-right">{seedAbbrev}</span>
+      <div className="relative h-6 w-6 shrink-0">
+        <Image
+          src={team.darkLogo}
+          alt={team.commonName.default}
+          fill
+          className="object-contain"
+          unoptimized
+        />
+      </div>
+      <span
+        className={`flex-1 text-sm truncate ${
+          isWinner ? 'font-bold text-primary' : 'text-foreground'
+        }`}
+      >
+        {team.commonName.default}
+      </span>
+      <span
+        className={`text-sm font-bold tabular-nums ${
+          isWinner ? 'text-primary' : 'text-muted-foreground'
+        }`}
+      >
+        {wins}
+      </span>
+    </div>
+  )
+}
+
+function SeriesCard({ series }: { series: PlayoffSeries }) {
+  const complete = series.winningTeamId !== 0
+  const topWon = complete && series.winningTeamId === series.topSeedTeam.id
+  const bottomWon = complete && series.winningTeamId === series.bottomSeedTeam.id
+
+  return (
+    <div className="rounded-lg border border-border bg-card px-3 py-1">
+      <TeamRow
+        team={series.topSeedTeam}
+        seedAbbrev={series.topSeedRankAbbrev}
+        wins={series.topSeedWins}
+        isWinner={topWon}
+        isDimmed={bottomWon}
+      />
+      <div className="border-t border-border/50" />
+      <TeamRow
+        team={series.bottomSeedTeam}
+        seedAbbrev={series.bottomSeedRankAbbrev}
+        wins={series.bottomSeedWins}
+        isWinner={bottomWon}
+        isDimmed={topWon}
+      />
+    </div>
+  )
+}
+
+export default function PlayoffBracket({ bracket }: { bracket: PlayoffBracket }) {
+  const rounds = [1, 2, 3, 4]
+
+  const roundsWithData = rounds
+    .map((round) => ({
+      round,
+      series: bracket.series
+        .filter((s) => s.playoffRound === round)
+        .sort((a, b) => a.seriesLetter.localeCompare(b.seriesLetter)),
+    }))
+    .filter((r) => r.series.length > 0)
+
+  if (roundsWithData.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">No playoff bracket data available for this season.</p>
+    )
+  }
+
+  return (
+    <div className="overflow-x-auto -mx-4 px-4 pb-2">
+      <div className="flex gap-3" style={{ minWidth: `${roundsWithData.length * 220}px` }}>
+        {roundsWithData.map(({ round, series }) => (
+          <div key={round} className="flex-1 min-w-[200px]">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {ROUND_LABELS[round] ?? `Round ${round}`}
+            </p>
+            <div className="space-y-2">
+              {series.map((s) => (
+                <SeriesCard key={s.seriesLetter} series={s} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
