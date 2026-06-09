@@ -165,3 +165,10 @@ export const AWARD_META: Record<string, { icon: string; image: string; descripti
 }
 
 export const STANLEY_CUP_IMAGE = '/awards/stanley-cup.jpg'
+
+// Normalize Unicode smart/curly quotes to ASCII before lookup,
+// since the NHL API returns e.g. Maurice “Rocket” Richard Trophy
+export function lookupAwardMeta(name: string) {
+  const normalized = name.replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+  return AWARD_META[normalized] ?? null
+}

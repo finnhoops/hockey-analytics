@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { PlayerSeasonTotal, PlayerAward } from '@/types/nhl'
 import { formatSeason } from '@/types/nhl'
-import { AWARD_META, STANLEY_CUP_WINNERS, STANLEY_CUP_IMAGE } from '@/lib/awards'
+import { lookupAwardMeta, STANLEY_CUP_WINNERS, STANLEY_CUP_IMAGE } from '@/lib/awards'
 
 interface Props {
   seasonTotals: PlayerSeasonTotal[]
@@ -208,11 +208,11 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
                             src={STANLEY_CUP_IMAGE}
                             alt="Stanley Cup Champion"
                             title="Stanley Cup Champion"
-                            className="h-6 w-6 object-contain inline-block cursor-help"
+                            className="h-9 w-9 object-contain inline-block cursor-help"
                           />
                         )}
                         {rowTrophies.map((trophy) => {
-                          const meta = AWARD_META[trophy]
+                          const meta = lookupAwardMeta(trophy)
                           if (!meta) return null
                           return (
                             <img
@@ -220,7 +220,7 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
                               src={meta.image}
                               alt={trophy}
                               title={`${trophy}: ${meta.description}`}
-                              className="h-6 w-6 object-contain inline-block cursor-help"
+                              className="h-9 w-9 object-contain inline-block cursor-help"
                             />
                           )
                         })}
@@ -280,15 +280,15 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
       {awards.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <img src={STANLEY_CUP_IMAGE} alt="Stanley Cup" className="h-5 w-5 object-contain" />
+            <img src={STANLEY_CUP_IMAGE} alt="Stanley Cup" className="h-7 w-7 object-contain" />
             Stanley Cup champion
           </span>
           {awards.map((a) => {
-            const meta = AWARD_META[a.trophy.default]
+            const meta = lookupAwardMeta(a.trophy.default)
             if (!meta) return null
             return (
               <span key={a.trophy.default} className="flex items-center gap-1.5">
-                <img src={meta.image} alt={a.trophy.default} className="h-5 w-5 object-contain" />
+                <img src={meta.image} alt={a.trophy.default} className="h-7 w-7 object-contain" />
                 {a.trophy.default}
               </span>
             )
