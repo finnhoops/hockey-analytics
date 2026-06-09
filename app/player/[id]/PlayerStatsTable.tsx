@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { PlayerSeasonTotal, PlayerAward } from '@/types/nhl'
 import { formatSeason } from '@/types/nhl'
-import { AWARD_META, STANLEY_CUP_WINNERS } from '@/lib/awards'
+import { AWARD_META, STANLEY_CUP_WINNERS, STANLEY_CUP_IMAGE } from '@/lib/awards'
 
 interface Props {
   seasonTotals: PlayerSeasonTotal[]
@@ -204,19 +204,24 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
                     <td className="pl-3 pr-1 py-2 text-left whitespace-nowrap">
                       <div className="flex items-center gap-0.5">
                         {cup && (
-                          <span className="text-base" title="Stanley Cup Champion">🏆</span>
+                          <img
+                            src={STANLEY_CUP_IMAGE}
+                            alt="Stanley Cup Champion"
+                            title="Stanley Cup Champion"
+                            className="h-6 w-6 object-contain inline-block cursor-help"
+                          />
                         )}
                         {rowTrophies.map((trophy) => {
                           const meta = AWARD_META[trophy]
                           if (!meta) return null
                           return (
-                            <span
+                            <img
                               key={trophy}
-                              className="text-sm cursor-help"
+                              src={meta.image}
+                              alt={trophy}
                               title={`${trophy}: ${meta.description}`}
-                            >
-                              {meta.icon}
-                            </span>
+                              className="h-6 w-6 object-contain inline-block cursor-help"
+                            />
                           )
                         })}
                       </div>
@@ -274,15 +279,17 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
       {/* Award legend */}
       {awards.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span>🏆</span> Stanley Cup champion
+          <span className="flex items-center gap-1.5">
+            <img src={STANLEY_CUP_IMAGE} alt="Stanley Cup" className="h-5 w-5 object-contain" />
+            Stanley Cup champion
           </span>
           {awards.map((a) => {
             const meta = AWARD_META[a.trophy.default]
             if (!meta) return null
             return (
-              <span key={a.trophy.default} className="flex items-center gap-1">
-                <span>{meta.icon}</span> {a.trophy.default}
+              <span key={a.trophy.default} className="flex items-center gap-1.5">
+                <img src={meta.image} alt={a.trophy.default} className="h-5 w-5 object-contain" />
+                {a.trophy.default}
               </span>
             )
           })}

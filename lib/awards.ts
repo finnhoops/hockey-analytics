@@ -89,63 +89,79 @@ export const PRESIDENTS_TROPHY: Record<number, string> = {
   20232024: 'NYR',
 }
 
-// Display metadata for each award (emoji icon + short description)
+// Display metadata for each award (image + short description)
 // Keys match the trophy.default string from the NHL player landing API
-export const AWARD_META: Record<string, { icon: string; description: string }> = {
+export const AWARD_META: Record<string, { icon: string; image: string; description: string }> = {
   'Hart Memorial Trophy': {
     icon: '🏆',
+    image: '/awards/hart.jpg',
     description: 'Most Valuable Player to his team',
   },
   'Art Ross Trophy': {
     icon: '📊',
+    image: '/awards/art-ross.jpg',
     description: 'Regular season scoring champion',
   },
-  "Maurice \"Rocket\" Richard Trophy": {
+  'Maurice "Rocket" Richard Trophy': {
     icon: '🚀',
+    image: '/awards/rocket-richard.jpg',
     description: 'Regular season goal scoring leader',
   },
   'Norris Trophy': {
     icon: '🛡️',
+    image: '/awards/norris.jpg',
     description: "Outstanding defenseman voted by the NHL's Professional Hockey Writers' Association",
   },
   'Vezina Trophy': {
     icon: '🥅',
+    image: '/awards/vezina.jpg',
     description: 'Outstanding goaltender voted by general managers',
   },
   'Calder Memorial Trophy': {
     icon: '⭐',
+    image: '/awards/calder.jpg',
     description: 'Most proficient player in his first NHL season',
   },
   'Lady Byng Memorial Trophy': {
     icon: '🤝',
+    image: '/awards/lady-byng.jpg',
     description: 'Most gentlemanly conduct combined with a high standard of play',
   },
   'Frank J. Selke Trophy': {
     icon: '🔒',
+    image: '/awards/selke.jpg',
     description: 'Outstanding defensive forward',
   },
   'Conn Smythe Trophy': {
     icon: '🏅',
+    image: '/awards/conn-smythe.jpg',
     description: 'Most Valuable Player in the playoffs',
   },
   'Bill Masterton Memorial Trophy': {
     icon: '💪',
+    image: '/awards/masterton.jpg',
     description: 'Perseverance, sportsmanship, and dedication to hockey',
   },
   'Ted Lindsay Award': {
     icon: '⚡',
+    image: '/awards/ted-lindsay.jpg',
     description: 'Most outstanding player as voted by fellow NHLPA members',
   },
   'Jack Adams Award': {
     icon: '🎯',
+    image: '/awards/jack-adams.jpg',
     description: "Coach adjudged to have contributed the most to his team's success",
   },
   'William M. Jennings Trophy': {
     icon: '🧤',
+    image: '/awards/jennings.jpg',
     description: 'Goaltender(s) with the fewest goals scored against them',
   },
   'King Clancy Memorial Trophy': {
     icon: '👑',
+    image: '/awards/king-clancy.jpg',
     description: 'Leadership qualities and humanitarian contributions to community',
   },
 }
+
+export const STANLEY_CUP_IMAGE = '/awards/stanley-cup.jpg'

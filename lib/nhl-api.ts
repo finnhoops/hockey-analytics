@@ -143,6 +143,28 @@ export interface SkaterRealtimeRow {
 
 export type SkaterFullStat = SkaterSummaryRow & Partial<SkaterRealtimeRow>
 
+// Fetch all pages from a paginated NHL stats endpoint (max 100 per page)
+async function fetchAllStatsPages<T>(path: string, sort: string, expr: string): Promise<T[]> {
+  const PAGE = 100
+  const cayenne = encodeURIComponent(expr)
+  const first = await getStats<{ data: T[]; total: number }>(
+    `${path}?limit=${PAGE}&start=0&sort=${sort}&cayenneExp=${cayenne}`
+  )
+  const all: T[] = [...first.data]
+  const pageCount = Math.ceil(first.total / PAGE)
+  if (pageCount > 1) {
+    const pages = await Promise.all(
+      Array.from({ length: pageCount - 1 }, (_, i) =>
+        getStats<{ data: T[] }>(
+          `${path}?limit=${PAGE}&start=${(i + 1) * PAGE}&sort=${sort}&cayenneExp=${cayenne}`
+        ).catch(() => ({ data: [] as T[] }))
+      )
+    )
+    for (const p of pages) all.push(...p.data)
+  }
+  return all
+}
+
 export async function getAllSkaterStats(
   season: number,
   gameType: number
@@ -150,17 +172,17 @@ export async function getAllSkaterStats(
   const expr = `seasonId=${season} and gameTypeId=${gameType}`
   const sortPoints = encodeURIComponent('[{"property":"points","direction":"DESC"}]')
   const sortHits = encodeURIComponent('[{"property":"hits","direction":"DESC"}]')
+
   const [summaryRes, realtimeRes] = await Promise.allSettled([
-    getStats<{ data: SkaterSummaryRow[] }>(
-      `/skater/summary?limit=1000&sort=${sortPoints}&cayenneExp=${encodeURIComponent(expr)}`
-    ),
-    getStats<{ data: SkaterRealtimeRow[] }>(
-      `/skater/realtime?limit=1000&sort=${sortHits}&cayenneExp=${encodeURIComponent(expr)}`
-    ),
+    fetchAllStatsPages<SkaterSummaryRow>('/skater/summary', sortPoints, expr),
+    fetchAllStatsPages<SkaterRealtimeRow>('/skater/realtime', sortHits, expr),
   ])
 
-  const summary = summaryRes.status === 'fulfilled' ? summaryRes.value.data : []
-  const realtime = realtimeRes.status === 'fulfilled' ? realtimeRes.value.data : []
+  if (summaryRes.status === 'rejected') console.error('NHL summary fetch failed:', summaryRes.reason)
+  if (realtimeRes.status === 'rejected') console.error('NHL realtime fetch failed:', realtimeRes.reason)
+
+  const summary = summaryRes.status === 'fulfilled' ? summaryRes.value : []
+  const realtime = realtimeRes.status === 'fulfilled' ? realtimeRes.value : []
 
   const realtimeMap = new Map(realtime.map((r) => [r.playerId, r]))
   return summary.map((s) => ({ ...s, ...realtimeMap.get(s.playerId) }))

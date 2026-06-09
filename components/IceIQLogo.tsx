@@ -74,37 +74,37 @@ export default function IceIQLogo({ className = 'h-8 w-8' }: Props) {
         strokeOpacity="0.6"
         fill="none"
       />
-      {/* Hockey stick 1 — shaft running diagonally top-right to bottom-left */}
+      {/* Hockey stick 1 — shaft top-right to bottom-left */}
       <line
         x1="28" y1="5"
         x2="13" y2="30"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.4"
         strokeLinecap="round"
       />
-      {/* Hockey stick 1 blade — short horizontal piece at bottom-left */}
-      <line
-        x1="10" y1="30"
-        x2="17" y2="30"
+      {/* Hockey stick 1 blade — curves out to the lower-left from shaft heel */}
+      <path
+        d="M 13 30 C 10 31.5 7 33 4 34.5"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.8"
         strokeLinecap="round"
+        fill="none"
       />
-      {/* Hockey stick 2 — shaft running diagonally top-left to bottom-right */}
+      {/* Hockey stick 2 — shaft top-left to bottom-right */}
       <line
         x1="12" y1="5"
         x2="27" y2="30"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.4"
         strokeLinecap="round"
       />
-      {/* Hockey stick 2 blade — short horizontal piece at bottom-right */}
-      <line
-        x1="23" y1="30"
-        x2="30" y2="30"
+      {/* Hockey stick 2 blade — curves out to the lower-right from shaft heel */}
+      <path
+        d="M 27 30 C 30 31.5 33 33 36 34.5"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.8"
         strokeLinecap="round"
+        fill="none"
       />
     </svg>
   )
