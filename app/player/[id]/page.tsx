@@ -163,21 +163,18 @@ export default async function PlayerPage({ params }: Props) {
             <div className="mt-3 flex flex-wrap gap-2">
               {awards.map((a) => {
                 const meta = lookupAwardMeta(a.trophy.default)
+                const label = meta?.abbrev ?? a.trophy.default
                 const tooltip = meta
                   ? `${a.trophy.default}: ${meta.description}${a.seasons.length > 1 ? ` (${a.seasons.length}×)` : ''}`
                   : a.trophy.default
                 return (
                   <span
                     key={a.trophy.default}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-amber-900/30 border border-amber-700/40 px-2.5 py-1 text-xs text-amber-300 font-medium cursor-help"
+                    className="inline-flex items-center gap-1 rounded-full bg-amber-900/30 border border-amber-700/40 px-2.5 py-1 text-xs text-amber-300 font-medium cursor-help"
                     title={tooltip}
                   >
-                    {meta && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={meta.image} alt={a.trophy.default} className="h-7 w-7 object-contain shrink-0" />
-                    )}
                     {a.seasons.length > 1 && <span className="font-bold">{a.seasons.length}×</span>}
-                    {a.trophy.default}
+                    {label}
                   </span>
                 )
               })}

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { PlayerSeasonTotal, PlayerAward } from '@/types/nhl'
 import { formatSeason } from '@/types/nhl'
-import { lookupAwardMeta, STANLEY_CUP_WINNERS, STANLEY_CUP_IMAGE } from '@/lib/awards'
+import { lookupAwardMeta, STANLEY_CUP_WINNERS } from '@/lib/awards'
 
 interface Props {
   seasonTotals: PlayerSeasonTotal[]
@@ -49,11 +49,6 @@ function teamAbbrevFromSeason(total: PlayerSeasonTotal): string | null {
   return MAP[name] ?? null
 }
 
-function pct(val?: number) {
-  if (val == null) return '—'
-  return (val * 100).toFixed(1) + '%'
-}
-
 function statOrDash(val?: number | null) {
   if (val == null) return '—'
   return val.toString()
@@ -79,27 +74,6 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
   const nhlRows = rows.filter((t) => t.leagueAbbrev === 'NHL')
   const otherRows = rows.filter((t) => t.leagueAbbrev !== 'NHL')
   const allRows = [...nhlRows, ...otherRows]
-
-  function rowAwards(row: PlayerSeasonTotal) {
-    const trophies = awardMap.get(row.season) ?? []
-    // Add Stanley Cup icon if player was on the Cup-winning team
-    if (tab === 'playoffs') {
-      const abbrev = teamAbbrevFromSeason(row)
-      if (abbrev && STANLEY_CUP_WINNERS[row.season] === abbrev) {
-        if (!trophies.includes('__cup__')) {
-          return ['__cup__', ...trophies]
-        }
-      }
-    } else {
-      const abbrev = teamAbbrevFromSeason(row)
-      if (abbrev && STANLEY_CUP_WINNERS[row.season] === abbrev) {
-        if (!trophies.includes('__cup__')) {
-          return ['__cup__', ...trophies]
-        }
-      }
-    }
-    return trophies
-  }
 
   function isCupRow(row: PlayerSeasonTotal) {
     const abbrev = teamAbbrevFromSeason(row)
@@ -156,7 +130,6 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
           <table className="w-full text-sm">
             <thead className="bg-secondary/60 border-b border-border">
               <tr>
-                <th className={`${thClass} text-left pl-3 w-4`} title="Awards"></th>
                 <th className={`${thClass} text-left`}>Season</th>
                 <th className={`${thClass} text-left`}>Team</th>
                 <th className={`${thClass} text-left`}>Lg</th>
@@ -177,6 +150,7 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
                 {tab === 'regular' && (
                   <th className={thClass} title="Faceoff Win %">FO%</th>
                 )}
+                <th className={`${thClass} text-left`} title="Awards">Awards</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -200,32 +174,6 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
                         : 'opacity-60 hover:bg-secondary/20',
                     ].join(' ')}
                   >
-                    {/* Award icons column */}
-                    <td className="pl-3 pr-1 py-2 text-left whitespace-nowrap">
-                      <div className="flex items-center gap-0.5">
-                        {cup && (
-                          <img
-                            src={STANLEY_CUP_IMAGE}
-                            alt="Stanley Cup Champion"
-                            title="Stanley Cup Champion"
-                            className="h-9 w-9 object-contain inline-block cursor-help"
-                          />
-                        )}
-                        {rowTrophies.map((trophy) => {
-                          const meta = lookupAwardMeta(trophy)
-                          if (!meta) return null
-                          return (
-                            <img
-                              key={trophy}
-                              src={meta.image}
-                              alt={trophy}
-                              title={`${trophy}: ${meta.description}`}
-                              className="h-9 w-9 object-contain inline-block cursor-help"
-                            />
-                          )
-                        })}
-                      </div>
-                    </td>
                     <td className={`${tdClass} text-left font-medium whitespace-nowrap`}>
                       {isHighlighted ? (
                         <span className="text-amber-400 font-bold">{formatSeason(row.season)}</span>
@@ -268,6 +216,26 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
                     {tab === 'regular' && (
                       <td className={tdClass}>{pctStat(row.faceoffWinningPctg)}</td>
                     )}
+                    <td className="px-2 py-2 text-left text-xs">
+                      {cup || rowTrophies.length > 0 ? (
+                        <div className="flex flex-col gap-0.5">
+                          {cup && (
+                            <span className="font-bold text-amber-300 whitespace-nowrap">SC (1st)</span>
+                          )}
+                          {rowTrophies.map((trophy) => {
+                            const meta = lookupAwardMeta(trophy)
+                            if (!meta) return null
+                            return (
+                              <span key={trophy} className="font-bold text-amber-300 whitespace-nowrap">
+                                {meta.abbrev} (1st)
+                              </span>
+                            )
+                          })}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
                   </tr>
                 )
               })}
@@ -276,25 +244,6 @@ export default function PlayerStatsTable({ seasonTotals, awards }: Props) {
         </div>
       )}
 
-      {/* Award legend */}
-      {awards.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <img src={STANLEY_CUP_IMAGE} alt="Stanley Cup" className="h-7 w-7 object-contain" />
-            Stanley Cup champion
-          </span>
-          {awards.map((a) => {
-            const meta = lookupAwardMeta(a.trophy.default)
-            if (!meta) return null
-            return (
-              <span key={a.trophy.default} className="flex items-center gap-1.5">
-                <img src={meta.image} alt={a.trophy.default} className="h-7 w-7 object-contain" />
-                {a.trophy.default}
-              </span>
-            )
-          })}
-        </div>
-      )}
     </div>
   )
 }
